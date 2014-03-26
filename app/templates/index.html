@@ -1,10 +1,74 @@
-<html>
-  <head>
-    <title>goofs - a reddit reader</title>
-  </head>
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/reveal.min.css">
+		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/theme/default.css" id="theme">
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+		<title> g o o f s </title>
+
+	</head>
+
   <body>
-  	{% for submission in submissions %}
-      <h1>{{submission}}</h1>
-    {% endfor %}
+
+  	{% if login_link: %}
+	  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with redit
+	
+	{% elif posts %}
+		<div class = "reveal">
+			<div class = "slides">
+
+				{% for post in posts: %}
+					<section id="{{post.url}}">
+						{{post.subreddit}}
+						{{post.title}}
+					</section>
+				{% endfor %}
+
+			</div>
+		</div>
+
+	{% endif %}
+
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
+	<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
+	<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
+
+	<script>
+
+
+	  // Full list of configuration options available here:
+	  // https://github.com/hakimel/reveal.js#configuration
+	  Reveal.initialize({
+	    controls: false,
+	    progress: true,
+	    history: false,
+	    center: true,
+	    //autoSlide: 5000,
+	    keyboard: true,
+	    //loop: true,
+
+	    theme: Reveal.getQueryHash().theme || 'night', // available themes are in /css/theme
+	    transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+	  });
+
+	  // set keyboard shortcuts
+
+	  //KeyboardJS.on('q', function() { steal(Reveal.getCurrentSlide()) }, null)        
+
+	</script>
+
   </body>
 </html>

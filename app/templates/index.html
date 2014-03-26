@@ -31,7 +31,7 @@
 
 				{% for post in posts: %}
 					<section id="{{post.url}}">
-						{{post.subreddit}}
+						<h3>{{post.subreddit}}</h3>
 						{{post.title}}
 					</section>
 				{% endfor %}
@@ -48,7 +48,6 @@
 
 	<script>
 
-
 	  // Full list of configuration options available here:
 	  // https://github.com/hakimel/reveal.js#configuration
 	  Reveal.initialize({
@@ -60,13 +59,41 @@
 	    keyboard: true,
 	    //loop: true,
 
-	    theme: Reveal.getQueryHash().theme || 'night', // available themes are in /css/theme
+	    theme: Reveal.getQueryHash().theme || 'serif', // available themes are in /css/theme
 	    transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 	  });
 
 	  // set keyboard shortcuts
+	  KeyboardJS.on('q', function() { queue(Reveal.getCurrentSlide()) }, null)
+	  KeyboardJS.on('l', checkIfTimeToOpenQueue, null)
 
-	  //KeyboardJS.on('q', function() { steal(Reveal.getCurrentSlide()) }, null)        
+	  // we open this queue after user is down browsing
+	  var read_queue = []
+
+	  // adds the URL for the given slide to our interest queue
+	  function queue(slide) {
+
+	  	// we keep post url in id of <section> tag
+	  	var url = $(slide).attr('id') 
+	  	read_queue.push(url)
+	  	console.log(read_queue)
+
+	  	// move slide deck forward
+	  	if (!Reveal.isLastSlide())
+	  		Reveal.right()
+
+	  }
+
+	  // if we are at end of list, open up all the urls
+	  // NB: this is triggered when 'l' key is pressed
+	  function checkIfTimeToOpenQueue() {
+
+	  	if (Reveal.isLastSlide()) 
+	  		for (var i=0;i<read_queue.length;i++) {
+	  			window.open(read_queue[i])
+	  	}
+
+	  }
 
 	</script>
 

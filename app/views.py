@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, session
+from flask import render_template, request, redirect, url_for, session, jsonify
 import praw
 from app import app
 
@@ -21,7 +21,7 @@ def index():
 		
 			# display posts...
 			print('getting fronptage')
-			posts = r.get_front_page(limit=100)
+			posts = r.get_front_page(limit=20)
 			return render_template("index.html",posts=posts)
 
 	# otherwise, start authentication process
@@ -54,3 +54,14 @@ def logout():
 	session['reddit_oauth'] = None
 
 	return redirect(url_for('index'))
+
+
+# here we recieve a POST request with the user's fav articles
+@app.route('/done', methods=['POST'])
+def done():
+
+	if request.json['posts']:
+
+		posts = request.json['posts']
+
+		return jsonify(html=render_template('review.html', posts=posts))

@@ -32,7 +32,7 @@
 				{% for post in posts: %}
 					<section id="{{post.url}}">
 						<h3>{{post.subreddit}}</h3>
-						{{post.title}}
+						<div class="title">{{post.title}}</div>
 					</section>
 				{% endfor %}
 
@@ -75,8 +75,13 @@
 
 	  	// we keep post url in id of <section> tag
 	  	var url = $(slide).attr('id') 
-	  	read_queue.push(url)
-	  	console.log(read_queue)
+	  	var title = $(slide).children('.title').html()
+
+	  	// add url to queue as a json object
+	  	read_queue.push({
+	  		url:url,
+	  		title:title
+	  	})
 
 	  	// move slide deck forward
 	  	if (!Reveal.isLastSlide())
@@ -88,14 +93,24 @@
 	  // NB: this is triggered when 'l' key is pressed
 	  function checkIfTimeToOpenQueue() {
 
-	  	if (Reveal.isLastSlide()) 
-	  		for (var i=0;i<read_queue.length;i++) {
-	  			window.open(read_queue[i])
+	  	if (Reveal.isLastSlide()) {
+
+	  		// post the json object to server
+	  		$.ajax({
+	  			type: 'POST',
+	  			url: '/done',
+	  			contentType: 'application/json',
+	  			dataType:'json',
+	  			data: JSON.stringify({posts: read_queue}),
+	  			success: function(data) {
+	  				console.log(data.html)
+	  				document.body.innerHTML = data.html
+	  			}
+	  		})
 	  	}
 
 	  }
 
 	</script>
-
   </body>
 </html>

@@ -88,9 +88,19 @@
 	  		title:title
 	  	})
 
+	  	// add visual feedback to the slide to mark interest
+	  	addInterestMarker($(slide))
+
 	  	// move slide deck forward
 	  	if (!Reveal.isLastSlide())
 	  		Reveal.right()
+
+	  }
+
+	  // takes a jquery object and puts an interest marker on it
+	  function addInterestMarker(slide) {
+
+	  		slide.append("<div class='i'><img src='static/i.png'></div>")
 
 	  }
 
@@ -108,7 +118,6 @@
 	  			dataType:'json',
 	  			data: JSON.stringify({posts: read_queue}),
 	  			success: function(data) {
-	  				console.log(data.html)
 	  				document.body.innerHTML = data.html
 	  			}
 	  		})

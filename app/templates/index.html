@@ -10,7 +10,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/reveal.min.css">
-		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/theme/default.css" id="theme">
+		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/theme/serif.css" id="theme">
 
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
@@ -22,25 +22,30 @@
 
   <body>
 
-  	{% if login_link: %}
-	  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with redit
-	
-	{% elif posts %}
-		<div class = "reveal">
-			<div class = "slides">
+	<div class = "reveal">
+		<div class = "slides">
 
-				{% for post in posts: %}
-					<section id="{{post.url}}">
-						<h3>{{post.subreddit}}</h3>
-						<div class="title">{{post.title}}</div>
-					</section>
-				{% endfor %}
+		  	{% if login_link: %}
+			  	<section>
+				  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with redit
+				</section>
+			
+			{% elif posts %}
 
-			</div>
+
+						{% for post in posts: %}
+							<section id="{{post.url}}">
+								<h3>{{post.subreddit}}</h3>
+								<div class="title">{{post.title}}</div>
+							</section>
+						{% endfor %}
+
+
+
+			{% endif %}
 		</div>
-
-	{% endif %}
-
+	</div>
+	
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
 	<script src="http://cosmopol.is/cereal/js/reveal.js"></script>

@@ -1,6 +1,12 @@
+{% if posts: %}
 
-  {% for post in posts: %}
-  <ul>
-  	<li><a href="{{post['url']}}" target="_blank">{{post.title}}</a><p></li>
-  </ul>
-  {% endfor %}
+	{% for post in posts: %}
+	<ul>
+		<li><a href="{{post['url']}}" target="_blank">{{post.title}}</a><p></li>
+	</ul>
+	{% endfor %}
+
+{% else: %}
+<img src="https://pbs.twimg.com/profile_images/413789063447994368/TP8sR7Z1.jpeg"><p>
+	you didnt like anything? :(
+{% endif %}

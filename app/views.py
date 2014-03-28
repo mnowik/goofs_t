@@ -20,8 +20,7 @@ def index():
 		if session['reddit_oauth'] is not None:
 		
 			# display posts...
-			print('getting fronptage')
-			posts = r.get_front_page(limit=20)
+			posts = r.get_front_page(limit=75)
 			return render_template("index.html",posts=posts)
 
 	# otherwise, start authentication process
@@ -41,7 +40,7 @@ def authorized():
 
 	# apply this code to praw
 	info = r.get_access_information(code)
-	
+
 	# redirect to index
 	return redirect(url_for('index'))
 
@@ -53,15 +52,18 @@ def logout():
 	# clear the user's oath token from session
 	session['reddit_oauth'] = None
 
-	return redirect(url_for('index'))
+	return redirect(url_for('logged_out'))
+
+@app.route('/logged_out')
+def logged_out():
+
+	return render_template("logged_out.html")
 
 
 # here we recieve a POST request with the user's fav articles
 @app.route('/done', methods=['POST'])
 def done():
 
-	if request.json['posts']:
+	posts = request.json['posts']
 
-		posts = request.json['posts']
-
-		return jsonify(html=render_template('review.html', posts=posts))
+	return jsonify(html=render_template('review.html', posts=posts))

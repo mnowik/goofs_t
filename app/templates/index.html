@@ -27,7 +27,8 @@
 
 			  	{% if login_link: %}
 				  	<section>
-					  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with reddit
+				  		<h3>ayyyy welcome</h3>
+					  	click <a href="{{login_link}}">here</a> to login to reddit
 					</section>
 				
 				{% elif posts %}
@@ -160,10 +161,14 @@
 				// if we haven't loaded it already,
 				if (ours.children(".embed").html() == undefined) {
 					ours.embedly({
-						query: { maxwidth: 450, wmode: 'transparent'},
+						query: { maxwidth: 700, wmode: 'transparent'},
 						key: 'd783a092be4446d1b18f0932593c59a5',
-						done: //remove spinner when loaded
-						function(data){ours.children(".wait").remove(); }
+						done: function(data){
+								//remove spinner when loaded
+								ours.children(".wait").remove();
+								// HACK
+								Reveal.up(); Reveal.down() 
+							}
 					})
 				}
 

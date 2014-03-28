@@ -20,111 +20,142 @@
 
 	</head>
 
-  <body>
+	<body>
 
-	<div class = "reveal">
-		<div class = "slides">
+		<div class = "reveal">
+			<div class = "slides">
 
-		  	{% if login_link: %}
-			  	<section>
-				  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with redit
-				</section>
-			
-			{% elif posts %}
-
-
-						{% for post in posts: %}
-							<section id="{{post.url}}">
-								<h3>{{post.subreddit}}</h3>
-								<div class="title">{{post.title}}</div>
-							</section>
-						{% endfor %}
+			  	{% if login_link: %}
+				  	<section>
+					  	eyyyy click <a href="{{login_link}}">here</a> to authorize us with reddit
+					</section>
+				
+				{% elif posts %}
 
 
+							{% for post in posts: %}
+								<section id="{{post.url}}">
+									<h3>{{post.subreddit}}</h3>
+									<div class="title">{{post.title}}</div>
+								</section>
+							{% endfor %}
 
-			{% endif %}
+
+
+				{% endif %}
+			</div>
 		</div>
-	</div>
-	
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
-	<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
-	<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
 
-	<script>
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
+		<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
+		<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
 
-	  // Full list of configuration options available here:
-	  // https://github.com/hakimel/reveal.js#configuration
-	  Reveal.initialize({
-	    controls: false,
-	    progress: true,
-	    history: false,
-	    center: true,
-	    //autoSlide: 5000,
-	    keyboard: true,
-	    //loop: true,
+		<script>
 
-	    theme: Reveal.getQueryHash().theme || 'serif', // available themes are in /css/theme
-	    transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
-	  });
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+			controls: false,
+			progress: true,
+			history: false,
+			center: true,
+			//autoSlide: 5000,
+			keyboard: true,
+			//loop: true,
 
-	  // set keyboard shortcuts
-	  KeyboardJS.on('q', function() { queue(Reveal.getCurrentSlide()) }, null)
-	  KeyboardJS.on('l', checkIfTimeToOpenQueue, null)
+			theme: Reveal.getQueryHash().theme || 'serif', // available themes are in /css/theme
+			transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+			});
 
-	  // we open this queue after user is down browsing
-	  var read_queue = []
+			// set keyboard shortcuts
+			KeyboardJS.on('q', function() { queue(Reveal.getCurrentSlide()) }, null)
+			KeyboardJS.on('l', checkIfTimeToOpenQueue, null)
 
-	  // adds the URL for the given slide to our interest queue
-	  function queue(slide) {
+			// we open this queue after user is down browsing
+			var read_queue = []
 
-	  	// we keep post url in id of <section> tag
-	  	var url = $(slide).attr('id') 
-	  	var title = $(slide).children('.title').html()
+			// adds the URL for the given slide to our interest queue
+			function queue(slide) {
 
-	  	// add url to queue as a json object
-	  	read_queue.push({
-	  		url:url,
-	  		title:title
-	  	})
+				// we keep post url in id of <section> tag
+			  	var url = $(slide).attr('id') 
+			  	var title = $(slide).children('.title').html()
 
-	  	// add visual feedback to the slide to mark interest
-	  	addInterestMarker($(slide))
+				if (!hasInterestMarker($(slide))) {
 
-	  	// move slide deck forward
-	  	if (!Reveal.isLastSlide())
-	  		Reveal.right()
+				  	// add url to queue as a json object
+				  	read_queue.push({
+				  		url:url,
+				  		title:title
+				  	})
 
-	  }
+				  	// add visual feedback to the slide to mark interest
+				  	addInterestMarker($(slide))
 
-	  // takes a jquery object and puts an interest marker on it
-	  function addInterestMarker(slide) {
+				} else {
 
-	  		slide.append("<div class='i'><img src='static/i.png'></div>")
+					// remove this article from the queue
+					for (var i=0;i<read_queue.length;i++) {
+						if (read_queue[i]['url'] === url) {
+							remove(read_queue,read_queue[i])
+						}
+					}
 
-	  }
+					console.log(read_queue)
 
-	  // if we are at end of list, open up all the urls
-	  // NB: this is triggered when 'l' key is pressed
-	  function checkIfTimeToOpenQueue() {
+					// remove interest marker
+					removeInterestMarker($(slide))
+				}
 
-	  	if (Reveal.isLastSlide()) {
+				// move slide deck forward
+				if (!Reveal.isLastSlide())
+					Reveal.right()
 
-	  		// post the json object to server
-	  		$.ajax({
-	  			type: 'POST',
-	  			url: '/done',
-	  			contentType: 'application/json',
-	  			dataType:'json',
-	  			data: JSON.stringify({posts: read_queue}),
-	  			success: function(data) {
-	  				document.body.innerHTML = data.html
-	  			}
-	  		})
-	  	}
+			}
 
-	  }
+			// takes a jquery object and puts an interest marker on it
+			// static/i.png is the interest marker
+			function addInterestMarker(slide) {
+					slide.append("<div class='i'><img src='static/i.png'></div>")
+			}
 
-	</script>
-  </body>
+			function removeInterestMarker(slide) {
+					slide.children('.i').remove()
+			}
+
+			// returns true if the slide has already been liked
+			function hasInterestMarker(slide) {
+				if (slide.children('.i').html() == undefined)
+					return false;
+				return true
+			}
+
+			// if we are at end of list, open up all the urls
+			// NB: this is triggered when 'l' key is pressed
+			function checkIfTimeToOpenQueue() {
+
+				if (Reveal.isLastSlide()) {
+
+					// post the json object to server
+					$.ajax({
+						type: 'POST',
+						url: '/done',
+						contentType: 'application/json',
+						dataType:'json',
+						data: JSON.stringify({posts: read_queue}),
+						success: function(data) {
+							document.body.innerHTML = data.html
+						}
+					})
+				}
+
+			}
+
+			// remove an item from an array
+			function remove(arr, item) {
+				for(var i = arr.length; i--;) {if(arr[i] === item) {arr.splice(i, 1); } } return arr } 
+
+		</script>
+	</body>
 </html>

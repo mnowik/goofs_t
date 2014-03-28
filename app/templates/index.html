@@ -50,6 +50,11 @@
 
 					{% endfor %}
 
+					<section>
+						<h3> ~at end~ </h3>
+						press next......
+					</section>
+
 
 
 				{% endif %}
@@ -81,7 +86,7 @@
 
 			// set keyboard shortcuts
 			KeyboardJS.on('q', function() { queue(Reveal.getCurrentSlide()) }, null)
-			KeyboardJS.on('l', checkIfTimeToOpenQueue, null)
+			KeyboardJS.on('l', checkIfEndOfFeed, null)
 
 			// we open this queue after user is down browsing
 			var read_queue = []
@@ -89,48 +94,56 @@
 			// adds the URL for the given slide to our interest queue
 			function queue(slide) {
 
-				// follow statement will return true if we're on a preview slide
-				if (!$(slide).attr('id')) {
+				// make sure we're not on the last slide
+				if (!Reveal.isLastSlide()) {
 
-					// we need to get the slide with the actual data in it
-					var main_slide = $(slide).prev()
+					//  if we're on a preview slide,
+					if (!$(slide).attr('id')) {
 
-				// otherwise, we're already on the main slide
-				} else {
-					var main_slide = $(slide)
-				}
+						// we need to get the slide with the actual data in it
+						var main_slide = $(slide).prev()
 
-				// we keep post url in id of <section> tag
-			  	var url = main_slide.attr('id') 
-			  	var title = main_slide.children('.title').html()
-
-				if (!hasInterestMarker(main_slide)) {
-
-				  	// add url to queue as a json object
-				  	read_queue.push({
-				  		url:url,
-				  		title:title
-				  	})
-
-				  	// add visual feedback to the slide to mark interest
-				  	addInterestMarker(main_slide)
-
-				} else {
-
-					// remove this article from the queue
-					for (var i=0;i<read_queue.length;i++) {
-						if (read_queue[i]['url'] === url) {
-							remove(read_queue,read_queue[i])
-						}
+					// otherwise, we're already on the main slide
+					} else {
+						var main_slide = $(slide)
 					}
 
-					// remove interest marker
-					removeInterestMarker(main_slide)
-				}
+					// we keep post url in id of <section> tag
+						var url = main_slide.attr('id') 
+						var title = main_slide.children('.title').html()
 
-				// move slide deck forward
-				if (!Reveal.isLastSlide())
-					Reveal.right()
+					if (!hasInterestMarker(main_slide)) {
+
+					  	// add url to queue as a json object
+					  	read_queue.push({
+					  		url:url,
+					  		title:title
+					  	})
+
+					  	// add visual feedback to the slide to mark interest
+					  	addInterestMarker(main_slide)
+
+					} else {
+
+						// remove this article from the queue
+						for (var i=0;i<read_queue.length;i++) {
+							if (read_queue[i]['url'] === url) {
+								remove(read_queue,read_queue[i])
+							}
+						}
+
+						// remove interest marker
+						removeInterestMarker(main_slide)
+					}
+
+
+					// check if we're done
+					checkIfEndOfFeed()
+
+					// move slide deck forward
+					if (!Reveal.isLastSlide())
+						Reveal.right()
+				}
 
 			}
 
@@ -174,8 +187,8 @@
 			}
 
 			// if we are at end of list, open up all the urls
-			// NB: this is triggered when 'l' key is pressed
-			function checkIfTimeToOpenQueue() {
+			// NB: this is triggered when 'l' key is pressed AND whenever queue() is called
+			function checkIfEndOfFeed() {
 
 				if (Reveal.isLastSlide()) {
 

@@ -33,12 +33,22 @@
 				{% elif posts %}
 
 
-							{% for post in posts: %}
-								<section id="{{post.url}}">
-									<h3>{{post.subreddit}}</h3>
-									<div class="title">{{post.title}}</div>
-								</section>
-							{% endfor %}
+					{% for post in posts: %}
+						<section>
+							
+							<section id="{{post.url}}">
+								<h3>{{post.subreddit}}</h3>
+								<div class="title">{{post.title}}</div>
+							</section>
+
+							<section data-state="loadmeta">
+								<div class="wait"><img src="static/wait.gif"></div>
+								<a href="{{post.url}}"></a>
+							</section>
+
+						</section>
+
+					{% endfor %}
 
 
 
@@ -50,6 +60,7 @@
 		<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
 		<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
 		<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
+		<script src="http://cdn.embed.ly/jquery.embedly-3.1.1.min.js" type="text/javascript"></script>
 
 		<script>
 
@@ -78,11 +89,22 @@
 			// adds the URL for the given slide to our interest queue
 			function queue(slide) {
 
-				// we keep post url in id of <section> tag
-			  	var url = $(slide).attr('id') 
-			  	var title = $(slide).children('.title').html()
+				// follow statement will return true if we're on a preview slide
+				if (!$(slide).attr('id')) {
 
-				if (!hasInterestMarker($(slide))) {
+					// we need to get the slide with the actual data in it
+					var main_slide = $(slide).prev()
+
+				// otherwise, we're already on the main slide
+				} else {
+					var main_slide = $(slide)
+				}
+
+				// we keep post url in id of <section> tag
+			  	var url = main_slide.attr('id') 
+			  	var title = main_slide.children('.title').html()
+
+				if (!hasInterestMarker(main_slide)) {
 
 				  	// add url to queue as a json object
 				  	read_queue.push({
@@ -91,7 +113,7 @@
 				  	})
 
 				  	// add visual feedback to the slide to mark interest
-				  	addInterestMarker($(slide))
+				  	addInterestMarker(main_slide)
 
 				} else {
 
@@ -102,10 +124,8 @@
 						}
 					}
 
-					console.log(read_queue)
-
 					// remove interest marker
-					removeInterestMarker($(slide))
+					removeInterestMarker(main_slide)
 				}
 
 				// move slide deck forward
@@ -113,6 +133,28 @@
 					Reveal.right()
 
 			}
+
+			// this gets called whenever a div with datatype "loadmeta" is the current slide. we use it to load the preview embed on demand.
+			Reveal.addEventListener( 'loadmeta', function() {
+				
+				//for some reason, this is not the slide we want, but the slide we just came from
+				var current_slide = Reveal.getCurrentSlide()
+
+				// get the slide we want
+				var ours = $(current_slide).next()
+								
+								
+				// if we haven't loaded it already,
+				if (ours.children(".embed").html() == undefined) {
+					ours.embedly({
+						query: { maxwidth: 450, wmode: 'transparent'},
+						key: 'd783a092be4446d1b18f0932593c59a5',
+						done: //remove spinner when loaded
+						function(data){ours.children(".wait").remove(); }
+					})
+				}
+
+			}, false );
 
 			// takes a jquery object and puts an interest marker on it
 			// static/i.png is the interest marker

@@ -17,11 +17,10 @@ def index():
 
 	# if user is already authenticated
 	if 'reddit_oauth' in session:
-		if session['reddit_oauth'] is not None:
-		
-			# display posts...
-			posts = r.get_front_page(limit=75)
-			return render_template("index.html",posts=posts)
+	
+		# display posts...
+		posts = r.get_front_page(limit=75)
+		return render_template("index.html",posts=posts)
 
 	# otherwise, start authentication process
 	link_with_refresh = r.get_authorize_url('UniqueKey', 'read', True)
@@ -50,7 +49,7 @@ def authorized():
 def logout():
 
 	# clear the user's oath token from session
-	session['reddit_oauth'] = None
+	session.pop('reddit_oauth', None)
 
 	return redirect(url_for('logged_out'))
 

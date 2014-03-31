@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ..
-virtualenv goofs
-cd goofs
+virtualenv twitter
+cd twitter
 bin/pip install flask
-bin/pip install praw 
+bin/pip install Flask-OAuthlib

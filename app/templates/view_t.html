@@ -1,0 +1,5 @@
+  {% if g.user and tweets%}
+    {% for tweet in tweets %}
+      <li>{{tweet.text}}</li>
+    {%endfor%}
+  {% endif %}

@@ -1,0 +1,14 @@
+  <h2>Overview</h2>
+
+  {% if g.user%}
+
+      <li><a href="{{ url_for('get_tweets') }}">Get Tweet</a></li>
+      <li><a href="{{ url_for('logout') }}">Sign out</a></li>
+
+
+  {% else %}
+    <p>
+      Sign in to do sweet things w this example application
+    <p>
+      <a href="{{ url_for('login') }}">Sign in</a>
+  {% endif %}

@@ -25,21 +25,13 @@
 		<div class = "reveal">
 			<div class = "slides">
 
-			  	{% if login_link: %}
-				  	<section>
-				  		<h3>ayyyy welcome</h3>
-					  	click <a href="{{login_link}}">here</a> to login to reddit
-					</section>
-				
-				{% elif posts %}
+			  	{% if g.user and posts: %}
 
-
-					{% for post in posts: %}
+			  		{% for post in posts: %}
 						<section>
-							
-							<section id="{{post.url}}">
-								<h3>{{post.subreddit}}</h3>
-								<div class="title">{{post.title}}</div>
+							<section id="{{post['user'].url}}">
+								<h3>{{post.text}}</h3>
+								<div class="title">{{post.url}}</div>
 							</section>
 
 							<section data-state="loadmeta">
@@ -51,10 +43,19 @@
 
 					{% endfor %}
 
-					<section>
-						<h3> ~at end~ </h3>
-						press next......
+						<section>
+							<h3> ~at end~ </h3>
+							press next......
+						</section>
+
+					{% else %}
+				  	<section>
+				  		<h3>ayyyy welcome</h3>
+					  	click <a href="{{url_for('login')}}">here</a> to login to reddit
 					</section>
+				
+
+
 
 
 
@@ -66,7 +67,6 @@
 		<script src="http://cosmopol.is/cereal/lib/js/head.min.js"></script>
 		<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
 		<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
-		<script src="http://cdn.embed.ly/jquery.embedly-3.1.1.min.js" type="text/javascript"></script>
 		<script src="static/cereal.js" type="text/javascript"></script>
 
 	</body>

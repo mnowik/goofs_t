@@ -1,68 +1,78 @@
-from flask import render_template, request, redirect, url_for, session, jsonify
-import praw
+from flask import render_template,flash, request, redirect, g, url_for, session, jsonify
+from flask_oauthlib.client import OAuth
 from app import app
 
-CLIENT_ID = 'QOkJLc1GlplZgA'
-CLIENT_SECRET = 'S5WFGh7QoKFKFxVtsN8YYzThyb4'
-REDIRECT_URI = 'http://127.0.0.1:5000/authorize_callback'
+SECRET_KEY = 'development key'
+DEBUG = True
+TWITTER_APP_ID = 'EdP2bzvybB6OoLwvF0g'
+TWITTER_APP_SECRET = 'xhFsWVj8NzZB0QrisQo1HBlnkpt2D5OuQfpPkxwvMo0'
+oauth =OAuth()
 
-r = praw.Reddit('goof')
-r.set_oauth_app_info(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+twitter = oauth.remote_app('twitter',
+    base_url='https://api.twitter.com/1.1/',
+    request_token_url='https://api.twitter.com/oauth/request_token',
+    access_token_url='https://api.twitter.com/oauth/access_token',
+    authorize_url='https://api.twitter.com/oauth/authenticate',
+    consumer_key= TWITTER_APP_ID,
+    consumer_secret=TWITTER_APP_SECRET
+)
+   #------------------ OAuth ---------------
+@twitter.tokengetter
+def get_twitter_token(token=None):
+    return session.get('twitter_token')
 
+@app.before_request
+def before_request():
+    g.user = None
+    if 'twitter_user' in session:
+        g.user = session['twitter_user']
 
-# index controls (1) login (2) post display
 @app.route('/')
-@app.route('/index')
 def index():
+    if 'twitter_user' in session:
+        posts=twitter.get('statuses/home_timeline.json')
+        return render_template("index.html",posts=posts.data)
+        
+    return render_template('index.html')
 
-	# if user is already authenticated
-	if 'reddit_oauth' in session:
-	
-		# display posts...
-		posts = r.get_front_page(limit=75)
-		return render_template("index.html",posts=posts)
+@app.route('/login')
+def login():
+    return twitter.authorize(callback=url_for('oauth_authorized',
+        next=request.args.get('next') or request.referrer or None))
 
-	# otherwise, start authentication process
-	link_with_refresh = r.get_authorize_url('UniqueKey', 'read', True)
-	return render_template("index.html", login_link=link_with_refresh)
+@app.route('/oauth-authorized')
+@twitter.authorized_handler
+def oauth_authorized(resp):
+    next_url = request.args.get('next') or url_for('index')
+    if resp is None:
+        flash(u'You denied the request to sign in.')
+        return redirect(next_url)
 
+    session['twitter_token'] = (
+        resp['oauth_token'],
+        resp['oauth_token_secret']
+    )
+    session['twitter_user'] = resp['screen_name']
 
-# this is called when reddit responds to our auth request
-@app.route('/authorize_callback')
-def authorized():
-
-	# get the auth code from the request reddit sent us
-	code = request.args.get('code', '')
-
-	# store this code in our session 
-	session['reddit_oauth'] = code
-
-	# apply this code to praw
-	info = r.get_access_information(code)
-
-	# redirect to index
-	return redirect(url_for('index'))
+    flash('You were signed in as %s' % resp['screen_name'])
+    return redirect(next_url)
 
 
-# logout routine
 @app.route('/logout')
 def logout():
-
-	# clear the user's oath token from session
-	session.pop('reddit_oauth', None)
-
-	return redirect(url_for('logged_out'))
-
-@app.route('/logged_out')
-def logged_out():
-
-	return render_template("logged_out.html")
+    session.pop('twitter_user', None)
+    return redirect(url_for('index'))
 
 
-# here we recieve a POST request with the user's fav articles
-@app.route('/done', methods=['POST'])
-def done():
+#------------------ functions -------------------
 
-	posts = request.json['posts']
+@app.route('/get_tweets')
+def get_tweets():
+	tweets=[]
+	resp = twitter.get('statuses/home_timeline.json')
+	if resp.status == 200:
+		tweets = resp.data  
+	return render_template('view_t.html',tweets=tweets)
 
-	return jsonify(html=render_template('review.html', posts=posts))
+
+

@@ -30,8 +30,13 @@ def before_request():
 @app.route('/')
 def index():
     if 'twitter_user' in session:
+        tweets=[{'html':'Welcome'}]
         posts=twitter.get('statuses/home_timeline.json')
-        return render_template("index.html",posts=posts.data)
+        if posts.data:
+            for tweet in posts.data:
+                tweets.append(embed_tweet(tweet['id']))
+            return render_template("index.html",tweets=tweets)
+
         
     return render_template('index.html')
 
@@ -73,6 +78,12 @@ def get_tweets():
 	if resp.status == 200:
 		tweets = resp.data  
 	return render_template('view_t.html',tweets=tweets)
+
+def embed_tweet(id):
+        resp = twitter.get('statuses/oembed.json?id='+str(id)+'&omit_script=true&align=center&maxwidth=550')
+        return resp.data
+
+
 
 
 

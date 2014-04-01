@@ -10,7 +10,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/reveal.min.css">
-		<link rel="stylesheet" href="http://cosmopol.is/cereal/css/theme/serif.css" id="theme">
+		<link rel="stylesheet" href="{{url_for('static', filename='serif.css')}}">
 
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
@@ -25,21 +25,12 @@
 		<div class = "reveal">
 			<div class = "slides">
 
-			  	{% if g.user and posts: %}
+			  	{% if g.user and tweets: %}
 
-			  		{% for post in posts: %}
-						<section>
-							<section id="{{post['user'].url}}">
-								<h3>{{post.text}}</h3>
-								<div class="title">{{post.url}}</div>
+			  		{%for tweet in tweets: %}
+							<section id="yolo">
+							  	{{tweet.html|safe}}
 							</section>
-
-							<section data-state="loadmeta">
-								<div class="wait"><img src="static/wait.gif"></div>
-								<a href="{{post.url}}"></a>
-							</section>
-
-						</section>
 
 					{% endfor %}
 
@@ -68,6 +59,7 @@
 		<script src="http://cosmopol.is/cereal/js/reveal.js"></script>
 		<script src="http://cosmopol.is/cereal/js/keyboard.js"></script>
 		<script src="static/cereal.js" type="text/javascript"></script>
+		<script src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 	</body>
 </html>

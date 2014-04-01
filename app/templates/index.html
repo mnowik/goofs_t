@@ -28,8 +28,8 @@
 			  	{% if g.user and tweets: %}
 
 			  		{%for tweet in tweets: %}
-							<section id="yolo">
-							  	{{tweet.html|safe}}
+							<section id="{{tweet.id}}">
+							  	{{tweet.content.html|safe}}
 							</section>
 
 					{% endfor %}

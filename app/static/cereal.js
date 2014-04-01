@@ -16,8 +16,41 @@ transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/c
 // set keyboard shortcuts
 KeyboardJS.on('q', function() { interestedIn(Reveal.getCurrentSlide()) }, null)
 KeyboardJS.on('l', function() { skip(Reveal.getCurrentSlide()) }, null)
-
+KeyboardJS.on('r', function() { retweet(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('m', function() { favorites(Reveal.getCurrentSlide()) }, null)
 // we open this queue after user is down browsing
+function favorites(slide) {
+	if ($(slide).attr('id')) {
+		$.ajax({
+			type: 'POST',
+			url: '/favorites',
+			contentType: 'application/json',
+			dataType:'json',
+			data: JSON.stringify({id: $(slide).attr('id') }) ,
+				success: function(data) {
+					alert('favorite');
+					alert(data);
+				}
+		})
+	} else { alert('No post') }
+}
+
+function retweet(slide) {
+	if ($(slide).attr('id')) {
+		$.ajax({
+			type: 'POST',
+			url: '/retweet',
+			contentType: 'application/json',
+			dataType:'json',
+			data: JSON.stringify({id: $(slide).attr('id') }) ,
+				success: function(data) {
+					alert('retweet');
+					alert(data);
+				}
+		})
+	} else { alert('No post') }
+}
+
 var read_queue = []
 
 // when we first express interest, we go to article preview
@@ -120,32 +153,6 @@ function queue(slide) {
 
 }
 
-// this gets called whenever a div with datatype "loadmeta" is the current slide. we use it to load the preview embed on demand.
-Reveal.addEventListener( 'loadmeta', function() {
-	
-	//for some reason, this is not the slide we want, but the slide we just came from
-	var current_slide = Reveal.getCurrentSlide()
-
-	// get the slide we want
-	var ours = $(current_slide).next()
-					
-					
-	// if we haven't loaded it already,
-	if (ours.children(".embed").html() == undefined) {
-		ours.embedly({
-			query: { maxwidth: 520, wmode: 'transparent'},
-			key: 'd783a092be4446d1b18f0932593c59a5',
-			done: function(data){
-					//remove spinner when loaded
-					ours.children(".wait").remove();
-					// HACK
-					Reveal.up(); Reveal.down() 
-				}
-		})
-	}
-
-}, false );
-
 // takes a jquery object and puts an interest marker on it
 // static/i.png is the interest marker
 function addInterestMarker(slide) {
@@ -183,6 +190,8 @@ function checkIfEndOfFeed() {
 	}
 
 }
+
+
 
 // remove an item from an array
 function remove(arr, item) {

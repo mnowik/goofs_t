@@ -2,10 +2,10 @@ from flask import render_template,flash, request, redirect, g, url_for, session,
 from flask_oauthlib.client import OAuth
 from app import app
 
-SECRET_KEY = 'development key'
+SECRET_KEY = 'd3333ayafds60dfjkizl'
 DEBUG = True
-TWITTER_APP_ID = 'eIHUTAYNCwVSwqiIzSduSWXkr'
-TWITTER_APP_SECRET = '2K2kQkn8UnKaXft7isaihodDCdXYdrn9lCLWtLKbMIbOMdXdUJ'
+TWITTER_APP_ID = 'ACp6sAezHKlfPLC3oA89v269j'
+TWITTER_APP_SECRET = 'CPcb6LktEyGIklnMvnbmr6UF3hxKIFBk2F18gjtiIDVn5IQbmB'
 oauth =OAuth()
 
 twitter = oauth.remote_app('twitter',
@@ -31,7 +31,7 @@ def before_request():
 def index():
     if 'twitter_user' in session:
         tweets=[{'content': {'html':'Welcome'} ,'id':0}]
-        posts=twitter.get('statuses/home_timeline.json')
+        posts=twitter.get('statuses/home_timeline.json', data={'count':100})
         if posts.data:
             for tweet in posts.data:
                 tweets.append({'content': embed_tweet(tweet['id']),'id': tweet['id']})
@@ -45,7 +45,7 @@ def login():
     return twitter.authorize(callback=url_for('oauth_authorized',
         next=request.args.get('next') or request.referrer or None))
 
-@app.route('/oauth-authorized')
+@app.route('/oauth_authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')
@@ -70,13 +70,13 @@ def logout():
 
 #------------------ functions -------------------
 
-@app.route('/get_tweets')
-def get_tweets():
-	tweets=[]
-	resp = twitter.get('statuses/home_timeline.json')
-	if resp.status == 200:
-		tweets = resp.data  
-	return render_template('view_t.html',tweets=tweets)
+# @app.route('/get_tweets')
+# def get_tweets():
+# 	tweets=[]
+# 	resp = twitter.get('statuses/home_timeline.json')
+# 	if resp.status == 200:
+# 		tweets = resp.data  
+# 	return render_template('view.html',tweets=tweets)
 
 @app.route('/retweet', methods=['POST'])
 def retweet():

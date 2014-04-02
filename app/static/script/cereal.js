@@ -14,10 +14,15 @@ transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/c
 });
 
 // set keyboard shortcuts
-KeyboardJS.on('q', function() { interestedIn(Reveal.getCurrentSlide()) }, null)
-KeyboardJS.on('l', function() { skip(Reveal.getCurrentSlide()) }, null)
-KeyboardJS.on('r', function() { retweet(Reveal.getCurrentSlide()) }, null)
-KeyboardJS.on('m', function() { favorites(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('l', function() { checkIfEndOfFeed() }, null)
+KeyboardJS.on('e', function() { checkIfEndOfFeed(); favorites(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('w', function() { checkIfEndOfFeed(); retweet(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('q', function() { checkIfEndOfFeed(); interestedIn(Reveal.getCurrentSlide()) }, null)
+
+// TODO: feedback
+// TODO: keylog
+// TODO: test queue functionality
+
 // we open this queue after user is down browsing
 function favorites(slide) {
 	if ($(slide).attr('id')) {
@@ -28,11 +33,13 @@ function favorites(slide) {
 			dataType:'json',
 			data: JSON.stringify({id: $(slide).attr('id') }) ,
 				success: function(data) {
-					alert('favorite');
-					alert(data);
 				}
 		})
-	} else { alert('No post') }
+
+		// go to the next slide
+		Reveal.right();
+					
+	}
 }
 
 function retweet(slide) {
@@ -44,11 +51,12 @@ function retweet(slide) {
 			dataType:'json',
 			data: JSON.stringify({id: $(slide).attr('id') }) ,
 				success: function(data) {
-					alert('retweet');
-					alert(data);
 				}
 		})
-	} else { alert('No post') }
+
+		// go to the next slide
+		Reveal.right();
+	} 
 }
 
 var read_queue = []
@@ -87,43 +95,6 @@ function skip(slide) {
 
 	// check if we're done
 	checkIfEndOfFeed()
-
-	// if we're on a main display slide,
-	if (!$(slide).attr('id')) {
-
-		// first of all, get the slide with the interest marker on it
-		var main_slide = $(slide).prev()
-
-		// second of all, go up
-		Reveal.up()
-
-	}
-
-	// otherwise, we're already on the main slide
-	else 
-		var main_slide = $(slide)
-
-
-
-	// if user was interested in it before
-	if (hasInterestMarker(main_slide)) {
-
-		// we keep post url in id of <section> tag
-		var url = main_slide.attr('id') 
-
-		// use url to lookup post
-		for (var i=0;i<read_queue.length;i++) {
-			if (read_queue[i]['url'] === url) {
-				// remove the post from the queue
-				remove(read_queue,read_queue[i])
-			}
-		}
-
-		// remove interest marker from the main slide
-		removeInterestMarker(main_slide)
-
-	}
-
 
 }
 

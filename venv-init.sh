@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd ..
-virtualenv twitter
-cd twitter
+virtualenv twibs 
+cd twibs
 bin/pip install flask
 bin/pip install Flask-OAuthlib

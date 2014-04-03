@@ -11,8 +11,8 @@
  * GLOBAL STYLES
  *********************************************/
 body {
-  background: #f0f1eb;
-  background-color: #f0f1eb; }
+  background: #fff;
+  background-color: #fff; }
 
 .reveal {
   font-family: "Palatino Linotype", "Book Antiqua", Palatino, FreeSerif, serif;
@@ -81,6 +81,12 @@ body {
   -ms-transition: all .2s linear;
   -o-transition: all .2s linear;
   transition: all .2s linear; }
+
+.reveal section .i img,
+.reveal section .r img,
+.reveal section .f img {
+  width:30px;
+}
 
 .reveal a:hover img {
   background: rgba(255, 255, 255, 0.2);

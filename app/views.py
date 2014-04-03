@@ -33,7 +33,7 @@ def before_request():
 def index():
     if 'twitter_user' in session:
         tweets=[{'content': {'html':'experimental twitter reader a1 (twibs)'} ,'id':0}]
-        posts=twitter.get('statuses/home_timeline.json', data={'count':100})
+        posts=twitter.get('statuses/home_timeline.json', data={'count':50})
         if posts.data:
             for tweet in posts.data:
                 tweets.append({'content': embed_tweet(tweet['id']),'id': tweet['id']})
@@ -75,11 +75,11 @@ def logout():
 @app.route('/done', methods=['POST'])
 def done():
     # these are the IDs of all queued tweets
-    tweet_ids = request.json['posts']
+    tweet_ids = request.json['tweet_ids']
 
     tweets = []
     for tweet_id in tweet_ids:
-        tweets.append({'content': embed_tweet(tweet_id)})
+        tweets.append({'content': tweet_id})
 
     # get the log and save it
     log = request.json

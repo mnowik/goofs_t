@@ -14,10 +14,12 @@ transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/c
 });
 
 // set keyboard shortcuts
-KeyboardJS.on('l', function() { checkIfEndOfFeed() }, null)
-KeyboardJS.on('e', function() { checkIfEndOfFeed(); favorites(Reveal.getCurrentSlide()) }, null)
-KeyboardJS.on('w', function() { checkIfEndOfFeed(); retweet(Reveal.getCurrentSlide()) }, null)
-KeyboardJS.on('q', function() { checkIfEndOfFeed(); interestedIn(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('e', function() { note('e'); checkIfEndOfFeed(); favorites(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('w', function() { note('w'); checkIfEndOfFeed(); retweet(Reveal.getCurrentSlide()) }, null)
+//KeyboardJS.on('q', function() { note('q'); checkIfEndOfFeed(); interestedIn(Reveal.getCurrentSlide()) }, null)
+//KeyboardJS.on('1', function() { note('1'); checkIfEndOfFeed(); skip(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('left', function() { note('left'); checkIfEndOfFeed() }, null)
+KeyboardJS.on('right', function() { note('right'); checkIfEndOfFeed() }, null)
 
 // TODO: feedback
 // TODO: keylog
@@ -36,9 +38,11 @@ function favorites(slide) {
 				}
 		})
 
-		// go to the next slide
-		Reveal.right();
-					
+		// add favorite marker
+		addMarker($(slide), 'f');
+
+		// go to the next slide after 300 ms delay
+		setTimeout(Reveal.right,300)
 	}
 }
 
@@ -54,8 +58,11 @@ function retweet(slide) {
 				}
 		})
 
-		// go to the next slide
-		Reveal.right();
+		// add retweet marker
+		addMarker($(slide), 'r');
+
+		// go to the next slide after 300 ms delay
+		setTimeout(Reveal.right,300)
 	} 
 }
 
@@ -94,7 +101,7 @@ function skip(slide) {
 		}
 
 		// remove interest marker from the main slide
-		removeInterestMarker(main_slide)
+		removeMarker(main_slide,'i')
 
 		// wait 300ms, then go right
 		setTimeout(function() { Reveal.right()}, 300);
@@ -120,7 +127,7 @@ function queue(slide) {
 	  	})
 
 	  	// add visual feedback to the slide to mark interest
-	  	addInterestMarker(main_slide)
+	  	addMarker(main_slide,'i')
 
 	  	// wait then go right
 	  	setTimeout(Reveal.right,300)
@@ -135,12 +142,12 @@ function queue(slide) {
 
 // takes a jquery object and puts an interest marker on it
 // static/i.png is the interest marker
-function addInterestMarker(slide) {
-		slide.append("<div class='i'><img src='static/i.png'></div>")
+function addMarker(slide, img) {
+		slide.append("<div class='"+img+"'><img src='static/img/"+img+".png'></div>")
 }
 
-function removeInterestMarker(slide) {
-		slide.children('.i').remove()
+function removeMarker(slide, img) {
+		slide.children('.'+img).remove()
 }
 
 // returns true if the slide has already been liked
@@ -148,6 +155,13 @@ function hasInterestMarker(slide) {
 	if (slide.children('.i').html() == undefined)
 		return false;
 	return true
+}
+
+keylog = []
+// adds char to memory, with timestamp
+function note(char) {
+  var d = new Date().getTime()
+  keylog.push({key:char, time:d})
 }
 
 // if we are at end of list, open up all the urls
@@ -162,7 +176,7 @@ function checkIfEndOfFeed() {
 			url: '/done',
 			contentType: 'application/json',
 			dataType:'json',
-			data: JSON.stringify({posts: read_queue}),
+			data: JSON.stringify({log:keylog}),
 			success: function(data) {
 				document.body.innerHTML = data.html
 			}
@@ -170,7 +184,6 @@ function checkIfEndOfFeed() {
 	}
 
 }
-
 
 
 // remove an item from an array

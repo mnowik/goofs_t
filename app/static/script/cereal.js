@@ -16,8 +16,8 @@ transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/c
 // set keyboard shortcuts
 KeyboardJS.on('e', function() { note('e'); checkIfEndOfFeed(); favorites(Reveal.getCurrentSlide()) }, null)
 KeyboardJS.on('w', function() { note('w'); checkIfEndOfFeed(); retweet(Reveal.getCurrentSlide()) }, null)
-//KeyboardJS.on('q', function() { note('q'); checkIfEndOfFeed(); interestedIn(Reveal.getCurrentSlide()) }, null)
-//KeyboardJS.on('1', function() { note('1'); checkIfEndOfFeed(); skip(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('q', function() { note('q'); checkIfEndOfFeed(); interestedIn(Reveal.getCurrentSlide()) }, null)
+KeyboardJS.on('1', function() { note('1'); checkIfEndOfFeed(); skip(Reveal.getCurrentSlide()) }, null)
 KeyboardJS.on('left', function() { note('left'); checkIfEndOfFeed() }, null)
 KeyboardJS.on('right', function() { note('right'); checkIfEndOfFeed() }, null)
 
@@ -113,17 +113,17 @@ function skip(slide) {
 // adds the URL for the given slide to our interest queue
 function queue(slide) {
 
-	// the main display slide has the url 
 	var main_slide = $(slide)
 
 	// we keep post url in id of <section> tag
 	var tweet_id = main_slide.attr('id') 
+	console.log(tweet_id)
 
 	if (!hasInterestMarker(main_slide)) {
 
 	  	// add url to queue as a json object
 	  	read_queue.push({
-	  		tweet_id:tweet_id,
+	  		tweet_id:tweet_id
 	  	})
 
 	  	// add visual feedback to the slide to mark interest
@@ -176,7 +176,7 @@ function checkIfEndOfFeed() {
 			url: '/done',
 			contentType: 'application/json',
 			dataType:'json',
-			data: JSON.stringify({log:keylog}),
+			data: JSON.stringify({tweet_ids: read_queue, log:keylog}),
 			success: function(data) {
 				document.body.innerHTML = data.html
 			}

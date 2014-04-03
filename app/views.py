@@ -79,7 +79,7 @@ def done():
 
     tweets=[{'content': {'html':'experimental twitter reader a1 (twibs)'}}]
     for tweet_id in tweet_ids:
-        tweets.append({'content': embed_tweet(tweet_id)})
+        tweets.append({'content': tweet_id})
 
     # get the log and save it
     log = request.json

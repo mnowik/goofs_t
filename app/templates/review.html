@@ -1,7 +1,7 @@
 {% if tweets: %}
 
 	{% for tweet in tweets: %}
-		{{tweet.content.html|safe}} <p>
+		{{tweet}} <p>
 	{% endfor %}
 
 {% else: %}

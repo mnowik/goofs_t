@@ -1,5 +1,7 @@
 from flask import render_template,flash, request, redirect, g, url_for, session, jsonify
 from flask_oauthlib.client import OAuth
+from datetime import datetime
+import json
 from app import app
 
 SECRET_KEY = 'd3333ayafds60dfjkizl'
@@ -30,7 +32,7 @@ def before_request():
 @app.route('/')
 def index():
     if 'twitter_user' in session:
-        tweets=[{'content': {'html':'Welcome'} ,'id':0}]
+        tweets=[{'content': {'html':'experimental twitter reader a1 (twibs)'} ,'id':0}]
         posts=twitter.get('statuses/home_timeline.json', data={'count':100})
         if posts.data:
             for tweet in posts.data:
@@ -68,15 +70,26 @@ def logout():
     return redirect(url_for('index'))
 
 
-#------------------ functions -------------------
+#------------------  POSTs -------------------
 
-# @app.route('/get_tweets')
-# def get_tweets():
-# 	tweets=[]
-# 	resp = twitter.get('statuses/home_timeline.json')
-# 	if resp.status == 200:
-# 		tweets = resp.data  
-# 	return render_template('view.html',tweets=tweets)
+@app.route('/done', methods=['POST'])
+def done():
+    # these are the IDs of all queued tweets
+    tweet_ids = request.json['posts']
+
+    tweets = []
+    for tweet_id in tweet_ids:
+        tweets.append({'content': embed_tweet(tweet_id)})
+
+    # get the log and save it
+    log = request.json
+    title = datetime.now().strftime("%d-%m-%y_%H:%M")
+    with open('logs/'+str(title)+'.json', 'w') as outfile:
+        json.dump(log, outfile)
+
+
+    return jsonify(html=render_template('review.html', tweets=tweets))
+
 
 @app.route('/retweet', methods=['POST'])
 def retweet():

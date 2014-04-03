@@ -1,9 +1,7 @@
 {% if posts: %}
 
-	{% for post in posts: %}
-	<ul>
-		<li><a href="{{post['url']}}" target="_blank">{{post.title}}</a><p></li>
-	</ul>
+	{% for tweet in tweets: %}
+		{{tweet.content.html|safe}} <p>
 	{% endfor %}
 
 {% else: %}

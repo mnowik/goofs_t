@@ -65,29 +65,10 @@ var read_queue = []
 // if we express interest from article preview, we queue and go to the next slide
 function interestedIn(slide) {
 
-	// make sure we're not on the last slide
-	if (!Reveal.isLastSlide()) {
+	// check if we're done
+	checkIfEndOfFeed()
 
-		//  if we're on the main display slide,
-		if ($(slide).attr('id')) {
-
-			// go down to the article preview slide
-			Reveal.down()
-
-		// if we're on a article preview slide
-		} else {
-
-			queue(slide)
-
-			// check if we're done
-			checkIfEndOfFeed()
-
-			// go up
-			Reveal.up()
-			// wait 150ms, then go right
-			setTimeout(Reveal.right, 300);
-		}
-	}
+	queue(slide);
 
 }
 
@@ -96,30 +77,58 @@ function skip(slide) {
 	// check if we're done
 	checkIfEndOfFeed()
 
+	var main_slide = $(slide)
+
+	// deque the slide if the user was interested in it before
+	if (hasInterestMarker(main_slide)) {
+
+		// we keep post url in id of <section> tag
+		var tweet_id = main_slide.attr('id') 
+
+		// use tweet_id to lookup post
+		for (var i=0;i<read_queue.length;i++) {
+			if (read_queue[i]['tweet_id'] === tweet_id) {
+				// remove the post from the queue
+				remove(read_queue,read_queue[i])
+			}
+		}
+
+		// remove interest marker from the main slide
+		removeInterestMarker(main_slide)
+
+		// wait 300ms, then go right
+		setTimeout(function() { Reveal.right()}, 300);
+	} else 
+		Reveal.right()
+
 }
 
 // adds the URL for the given slide to our interest queue
 function queue(slide) {
 
 	// the main display slide has the url 
-	var main_slide = $(slide).prev()
+	var main_slide = $(slide)
 
 	// we keep post url in id of <section> tag
-	var url = main_slide.attr('id') 
-	var title = main_slide.children('.title').html()
+	var tweet_id = main_slide.attr('id') 
 
 	if (!hasInterestMarker(main_slide)) {
 
 	  	// add url to queue as a json object
 	  	read_queue.push({
-	  		url:url,
-	  		title:title
+	  		tweet_id:tweet_id,
 	  	})
 
 	  	// add visual feedback to the slide to mark interest
 	  	addInterestMarker(main_slide)
 
-	}
+	  	// wait then go right
+	  	setTimeout(Reveal.right,300)
+
+	// if it does have an interest marker, just go right
+	} else 
+		Reveal.right()
+	
 	
 
 }

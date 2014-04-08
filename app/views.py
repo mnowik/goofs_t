@@ -1,11 +1,13 @@
 from flask import render_template,flash, request, redirect, g, url_for, session, jsonify
 from flask_oauthlib.client import OAuth
+from datetime import datetime
+import json
 from app import app
 
-SECRET_KEY = 'development key'
+SECRET_KEY = 'd3333ayafds60dfjkizl'
 DEBUG = True
-TWITTER_APP_ID = 'eIHUTAYNCwVSwqiIzSduSWXkr'
-TWITTER_APP_SECRET = '2K2kQkn8UnKaXft7isaihodDCdXYdrn9lCLWtLKbMIbOMdXdUJ'
+TWITTER_APP_ID = 'ACp6sAezHKlfPLC3oA89v269j'
+TWITTER_APP_SECRET = 'CPcb6LktEyGIklnMvnbmr6UF3hxKIFBk2F18gjtiIDVn5IQbmB'
 oauth =OAuth()
 
 twitter = oauth.remote_app('twitter',
@@ -30,8 +32,8 @@ def before_request():
 @app.route('/')
 def index():
     if 'twitter_user' in session:
-        tweets=[{'content': {'html':'Welcome'} ,'id':0}]
-        posts=twitter.get('statuses/home_timeline.json')
+        tweets=[{'content': {'html':'experimental twitter reader a1 (twibs)'} ,'id':0}]
+        posts=twitter.get('statuses/home_timeline.json', data={'count':50})
         if posts.data:
             for tweet in posts.data:
                 tweets.append({'content': embed_tweet(tweet['id']),'id': tweet['id']})
@@ -45,7 +47,7 @@ def login():
     return twitter.authorize(callback=url_for('oauth_authorized',
         next=request.args.get('next') or request.referrer or None))
 
-@app.route('/oauth-authorized')
+@app.route('/oauth_authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')
@@ -68,15 +70,26 @@ def logout():
     return redirect(url_for('index'))
 
 
-#------------------ functions -------------------
+#------------------  POSTs -------------------
 
-@app.route('/get_tweets')
-def get_tweets():
-	tweets=[]
-	resp = twitter.get('statuses/home_timeline.json')
-	if resp.status == 200:
-		tweets = resp.data  
-	return render_template('view_t.html',tweets=tweets)
+@app.route('/done', methods=['POST'])
+def done():
+    # these are the IDs of all queued tweets
+    tweet_ids = request.json['tweet_ids']
+
+    tweets=[{'content': {'html':'experimental twitter reader a1 (twibs)'}}]
+    for tweet_id in tweet_ids:
+        tweets.append({'content': tweet_id})
+
+    # get the log and save it
+    log = request.json
+    title = datetime.now().strftime("%d-%m-%y_%H:%M")
+    with open('logs/'+str(title)+'.json', 'w') as outfile:
+        json.dump(log, outfile)
+
+
+    return jsonify(html=render_template('review.html', tweets=tweets))
+
 
 @app.route('/retweet', methods=['POST'])
 def retweet():

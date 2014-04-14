@@ -30,11 +30,11 @@ def before_request():
 @app.route('/')
 def index():
     if 'twitter_user' in session:
-        tweets=[{'content': {'html':'Welcome'} ,'id':0}]
+        tweets=[{'embed_content': {'html':'Welcome'} ,'id':0 ,'text':''}]
         posts=twitter.get('statuses/home_timeline.json')
         if posts.data:
             for tweet in posts.data:
-                tweets.append({'content': embed_tweet(tweet['id']),'id': tweet['id']})
+                tweets.append({'embed_content': embed_tweet(tweet['id']),'id': tweet['id'],'text': tweet['text']})
             return render_template("index.html",tweets=tweets)
 
         
@@ -45,7 +45,7 @@ def login():
     return twitter.authorize(callback=url_for('oauth_authorized',
         next=request.args.get('next') or request.referrer or None))
 
-@app.route('/oauth-authorized')
+@app.route('/oauth_authorized')
 @twitter.authorized_handler
 def oauth_authorized(resp):
     next_url = request.args.get('next') or url_for('index')

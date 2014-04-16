@@ -29,7 +29,7 @@
 
 			  		{%for tweet in tweets: %}
 							<section id="{{tweet.id}}">
-								<h2>{{tweet.text}}</h2>
+								<p>{{tweet.text}}</p>
 							  	{{tweet.embed_content.html|safe}}
 							</section>
 

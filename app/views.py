@@ -1,6 +1,8 @@
 from flask import render_template,flash, request, redirect, g, url_for, session, jsonify
 from flask_oauthlib.client import OAuth
 from app import app
+import re, HTMLParser
+ 
 
 SECRET_KEY = 'development key'
 DEBUG = True
@@ -34,7 +36,7 @@ def index():
         posts=twitter.get('statuses/home_timeline.json')
         if posts.data:
             for tweet in posts.data:
-                tweets.append({'embed_content': embed_tweet(tweet['id']),'id': tweet['id'],'text': tweet['text']})
+                tweets.append({'embed_content': embed_tweet(tweet['id']),'id': tweet['id'],'text': cleaning(tweet['text'])})
             return render_template("index.html",tweets=tweets)
 
         
@@ -91,6 +93,12 @@ def favorites():
 def embed_tweet(id):
         resp = twitter.get('statuses/oembed.json?id='+str(id)+'&omit_script=true&align=center&maxwidth=550')
         return resp.data
+
+def cleaning(plain_text):
+        plain_text=re.sub(r'#(\w+:?)', '', plain_text)
+        plain_text=re.sub(r'@([A-Za-z0-9_]+:?)', '', plain_text)
+        plain_text=re.sub(r'(?P<url>https?://[^\s]+)', '', plain_text)        
+        return HTMLParser.HTMLParser().unescape(plain_text)
 
 
 
